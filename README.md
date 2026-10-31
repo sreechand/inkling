@@ -55,3 +55,26 @@ The patch script is idempotent-ish: `replaceOnce` logs "already patched" if the 
 
 - Patching is string-replacement on a compiled upstream bundle — pinning to `wojooo/inker:0.6.0` is intentional; bumping the base image may break `replaceOnce` lookups until patterns are updated.
 - OAuth credentials and API tokens are stored encrypted via the upstream `EncryptionService`.
+
+## A Second Heart literary clock
+
+The bundled **A Second Heart** plugin displays a credited literary quote for the
+current minute, with the time phrase highlighted. It includes 10,156 quotes covering
+every minute, requires no account or API key, and makes no external data requests.
+
+After rebuilding this image, click **Install** on **A Second Heart** in Plugins.
+Open **Installed → Settings**, save its timezone
+(for example `Asia/Kolkata`), and add it to a full-screen screen. Use a portrait
+screen of 600 × 800 or larger. Configure the screen and Kindle to refresh every
+60 seconds where supported; the plugin cannot wake a sleeping device.
+
+`SECOND_HEART_PLUGIN_JSON` overrides the build-time manifest path (default
+`/tmp/second-heart-plugin.json`). The quotes and integration come from
+[A Second Heart](https://github.com/sreechand/a-second-heart), whose integration
+code is GPL-3.0; book excerpts retain their original authorship.
+This is an Inkling screen, not a replacement for Kindle's native lock screen.
+
+Validated locally against the actual Inker 0.6.0 ARM64 container: plugin installation,
+settings save, minute cache rollover, and instance/saved-screen rendering at
+600 × 800 and 1072 × 1448. Physical Kindle refresh remains untested.
+The repeatable disposable-container check is `tests/second-heart-smoke.cjs`.

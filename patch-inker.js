@@ -4,6 +4,7 @@ const mainPath = process.env.INKER_MAIN_JS || '/app/dist/main.js';
 let source = fs.readFileSync(mainPath, 'utf8');
 const googleCalendarPluginPath = process.env.GOOGLE_CALENDAR_PLUGIN_JSON || '/tmp/google-calendar-plugin.json';
 const googleCalendarPlugin = JSON.parse(fs.readFileSync(googleCalendarPluginPath, 'utf8'));
+const secondHeartPlugin = JSON.parse(fs.readFileSync(process.env.SECOND_HEART_PLUGIN_JSON || '/tmp/second-heart-plugin.json', 'utf8'));
 
 function patchResolutionPreset() {
   const assetsDir = process.env.INKER_FRONTEND_ASSETS || '/usr/share/nginx/html/assets';
@@ -326,7 +327,7 @@ replaceOnce(
 );
 
 const todoistBuiltinsSource = `const builtins = [this.grafanaPluginDefinition(), ${JSON.stringify(todoistPlugin, null, 12)}];`;
-const googleBuiltinsSource = `const builtins = [this.grafanaPluginDefinition(), ${JSON.stringify(todoistPlugin, null, 12)}, ${JSON.stringify(googleCalendarPlugin, null, 12)}];`;
+const googleBuiltinsSource = `const builtins = [this.grafanaPluginDefinition(), ${JSON.stringify(todoistPlugin, null, 12)}, ${JSON.stringify(googleCalendarPlugin, null, 12)}, ${JSON.stringify(secondHeartPlugin, null, 12)}];`;
 
 if (!source.includes(googleBuiltinsSource)) {
   replaceOnce(
@@ -744,6 +745,12 @@ replaceOnce(
                     };
                 }
                 return widget;`,
+);
+
+replaceOnce(
+  'second heart minute cache',
+  `if (age < plugin.refreshInterval) {`,
+  `if (age < plugin.refreshInterval && (plugin.slug !== 'a_second_heart' || Math.floor(Date.now() / 60000) === Math.floor(instance.lastFetchedAt.getTime() / 60000))) {`,
 );
 
 fs.writeFileSync(mainPath, source);
